@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple A/B Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Simple A/B Demo</h1>
+        <p>User ID: <span id="userId"></span></p>
+        <button id="demoButton">Loading...</button>
+    </div>
+
+    <script>
+        let treatment = '';
+        let userId = '';
+
+        async function fetchButtonDetails()
+        {
+            const response = await fetch('/button-details');
+            const data = await response.json();
+            document.getElementById('demoButton').textContent = data.buttonText;
+            document.getElementById('userId').textContent = data.userId;
+            treatment = data.treatment;
+            userId = data.userId;
+        }
+
+        async function handleButtonClick()
+        {
+
+            try
+            {
+                const response = await fetch('/button-click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ treatment, userId }),
+                });
+
+                if (!response.ok)
+                {
+                    throw new Error('Network response was not ok');
+                }
+
+                // You could send the latency to the server here if needed
+            } catch (error)
+            {
+                console.error('Error:', error);
+            }
+        }
+
+        document.getElementById('demoButton').addEventListener('click', handleButtonClick);
+
+        fetchButtonDetails();
+    </script>
+</body>
+
+</html>
